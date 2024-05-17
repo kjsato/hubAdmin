@@ -42,7 +42,8 @@ check_config_schema_version <- function(schema_version, config = c("tasks", "adm
   }
 
   check_prefix <- grepl(
-    "https://raw.githubusercontent.com/Infectious-Disease-Modeling-Hubs/schemas/main/",
+  # "https://raw.githubusercontent.com/Infectious-Disease-Modeling-Hubs/schemas/main/",
+    "https://raw.githubusercontent.com/kjsato/schemas/",
     schema_version,
     fixed = TRUE
   )
