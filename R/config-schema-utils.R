@@ -1,4 +1,4 @@
-get_config_file_schema_version <- function(config_path, config) {
+get_config_file_schema_version <- function(config_path, config, complete_string = FALSE) {
   config_schema_version <- jsonlite::read_json(config_path)$schema_version
 
   if (is.null(config_schema_version)) {
@@ -9,19 +9,23 @@ get_config_file_schema_version <- function(config_path, config) {
     config = config
   )
 
-  version <- hubUtils::extract_schema_version(config_schema_version)
+  if (complete_string) {
+    return(config_schema_version)
+  } else {
+    version <- hubUtils::extract_schema_version(config_schema_version)
 
-  if (length(version) == 0L) {
-    cli::cli_abort(
-      c(
-        "x" = "Valid {.field version} could not be extracted from config
-            file {.file {config_path}}",
-        "!" = "Please check property {.val schema_version} is correctly formatted."
+    if (length(version) == 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "Valid {.field version} could not be extracted from config
+              file {.file {config_path}}",
+          "!" = "Please check property {.val schema_version} is correctly formatted."
+        )
       )
-    )
-  }
+    }
 
   version
+  }
 }
 
 
