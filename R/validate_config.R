@@ -69,9 +69,13 @@ validate_config <- function(hub_path = ".",
     schema_version <- get_config_file_schema_version(config_path, config)
   }
 
+  # Extract the schema_repo from the schema_version URL
+  schema_repo <- gsub("https://raw.githubusercontent.com/([^/]+)/.*", "\\1",
+                      get_config_file_schema_version(config_path, config))
+
   # Get the latest version available in our GitHub schema repo
   if (schema_version == "latest") {
-    schema_version <- hubUtils::get_schema_valid_versions(branch = branch) %>%
+    schema_version <- hubUtils::get_schema_valid_versions(branch = branch, schema_repo = schema_repo) %>%
       sort() %>%
       utils::tail(1)
   }
@@ -85,7 +89,8 @@ validate_config <- function(hub_path = ".",
   schema_url <- hubUtils::get_schema_url(
     config = config,
     version = schema_version,
-    branch = branch
+    branch = branch,
+    schema_repo = schema_repo # pass the schema_repo to get_schema_url
   )
 
   schema_json <- hubUtils::get_schema(schema_url)
