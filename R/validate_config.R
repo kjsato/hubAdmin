@@ -72,7 +72,7 @@ validate_config <- function(hub_path = ".",
   # Extract the schema_repo from the schema_version URL
   schema_repo <- gsub("https://raw.githubusercontent.com/([^/]+)/.*", "\\1",
                       get_config_file_schema_version(config_path, config, complete_string = TRUE))
-  schema_repo <- paste0(schema_repo, '/schemas/')
+  schema_repo <- paste0(schema_repo, '/schemas')
 
   # Get the latest version available in our GitHub schema repo
   if (schema_version == "latest") {
