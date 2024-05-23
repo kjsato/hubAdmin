@@ -45,8 +45,12 @@ check_config_schema_version <- function(schema_version, config = c("tasks", "adm
     ))
   }
 
+  # Extract the schema_repo from the schema_version URL
+  split_schema_version <- strsplit(schema_version, "/")[[1]]
+  schema_repo <- paste(split_schema_version[4:5], collapse = "/")
+
   check_prefix <- grepl(
-    "https://raw.githubusercontent.com/kjsato/schemas/",
+    paste0("https://raw.githubusercontent.com/", schema_repo),
     schema_version,
     fixed = TRUE
   )
@@ -55,14 +59,15 @@ check_config_schema_version <- function(schema_version, config = c("tasks", "adm
     cli::cli_abort(c(
       "x" = "Invalid {.code schema_version} property.",
       "i" = "Valid {.code schema_version} properties should start with
-                         {.val https://raw.githubusercontent.com/kjsato/schemas/br-v3.0.0/}
+                         {.val https://raw.githubusercontent.com/{schema_repo}/{schema_version}}
                          and resolve to the schema file's raw contents on GitHub."
     ))
   }
 }
 
 
-validate_schema_version_property <- function(validation, config = c("tasks", "admin")) {
+validate_schema_version_property <- function(validation, config = c("tasks", "admin"),
+                                             schema_repo = "Infectious-Disease-Modeling-Hubs/schemas") {
   config <- rlang::arg_match(config)
   schema_version <- jsonlite::read_json(attr(validation, "config_path"),
     simplifyVector = TRUE,
@@ -93,7 +98,7 @@ validate_schema_version_property <- function(validation, config = c("tasks", "ad
     )
   }
 
-  check_prefix <- grepl("https://raw.githubusercontent.com/kjsato/schemas/br-v3.0.0/",
+  check_prefix <- grepl(paste0("https://raw.githubusercontent.com/", schema_repo),
     schema_version,
     fixed = TRUE
   )
@@ -105,9 +110,9 @@ validate_schema_version_property <- function(validation, config = c("tasks", "ad
         instancePath = get_error_path(schema, "schema_version", "instance"),
         schemaPath = get_error_path(schema, "schema_version", "schema"),
         keyword = "schema_version prefix",
-        message = paste(
-          "Invalid 'schema_version' property. Should start with",
-          "'https://raw.githubusercontent.com/kjsato/schemas/br-v3.0.0/'"
+        message = glue::glue(
+          "Invalid 'schema_version' property. Should start with
+          {.val https://raw.githubusercontent.com/{schema_repo}/{schema_version}}"
         ),
         schema = "",
         data = schema_version

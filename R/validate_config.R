@@ -110,7 +110,7 @@ validate_config <- function(hub_path = ".",
 
 
   if (validation) {
-    validation <- validate_schema_version_property(validation, config)
+    validation <- validate_schema_version_property(validation, config, schema_repo)
     if (config == "tasks") {
       validation <- perform_dynamic_config_validations(validation)
     }
