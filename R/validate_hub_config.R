@@ -24,7 +24,7 @@
 #'   )
 #' )
 validate_hub_config <- function(hub_path = ".", schema_version = "from_config",
-                                branch = "main", schema_repo = "Infectious-Disease-Modeling-Hubs/schemas") {
+                                branch = "main", schema_repo = "hubverse-org/schemas") {
   configs <- c("tasks", "admin")
 
   # First only validate config files
@@ -35,7 +35,7 @@ validate_hub_config <- function(hub_path = ".", schema_version = "from_config",
       config = .x,
       schema_version = schema_version,
       branch = branch,
-     # schema_repo = schema_repo
+      # schema_repo = schema_repo
     )
   ) %>%
     purrr::set_names(configs) %>%
