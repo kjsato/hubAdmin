@@ -1,6 +1,6 @@
 Package: hubAdmin
 Title: Utilities for administering hubverse Hubs
-Version: 1.0.1
+Version: 1.0.1-1
 Authors@R: 
     c(person("Anna", "Krystalli", , "annakrystalli@googlemail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2378-4915")),
@@ -43,8 +43,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.2.0)
 Remotes:
-    hubverse-org/hubData,
-    hubverse-org/hubUtils
+    kjsato/hubData@main-mr_schema,
+    kjsato/hubUtils@main-mr_schema
 Config/Needs/website: hubverse-org/hubStyle
 Depends: 
     R (>= 2.10)

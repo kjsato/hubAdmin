@@ -36,7 +36,7 @@
 #'   )
 #' )
 validate_hub_config <- function(hub_path = ".", schema_version = "from_config",
-                                branch = "main") {
+                                branch = "main", schema_repo = "hubverse-org/schemas") {
   configs <- c("tasks", "admin")
 
   # First only validate config files
@@ -46,7 +46,8 @@ validate_hub_config <- function(hub_path = ".", schema_version = "from_config",
       hub_path = hub_path,
       config = .x,
       schema_version = schema_version,
-      branch = branch
+      branch = branch,
+      # schema_repo = schema_repo
     )
   ) %>%
     purrr::set_names(configs) %>%
@@ -119,8 +120,8 @@ validate_hub_config <- function(hub_path = ".", schema_version = "from_config",
   attr(validations, "config_dir") <- fs::path(hub_path, "hub-config")
   attr(validations, "schema_version") <- schema_version
   attr(validations, "schema_url") <- gsub(
-    "https://raw.githubusercontent.com/hubverse-org/schemas/",
-    "https://github.com/hubverse-org/schemas/tree/",
+    paste0("https://raw.githubusercontent.com/", schema_repo, "/"),
+    paste0("https://github.com/", schema_repo, "/tree/"),
     unique(schema_url_dirnames),
     fixed = TRUE
   )

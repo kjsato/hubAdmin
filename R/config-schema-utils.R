@@ -1,4 +1,4 @@
-get_config_file_schema_version <- function(config_path, config) {
+get_config_file_schema_version <- function(config_path, config, complete_string = FALSE) {
   config_schema_version <- jsonlite::read_json(config_path)$schema_version
 
   if (is.null(config_schema_version)) {
@@ -9,19 +9,23 @@ get_config_file_schema_version <- function(config_path, config) {
     config = config
   )
 
-  version <- hubUtils::extract_schema_version(config_schema_version)
+  if (complete_string) {
+    return(config_schema_version)
+  } else {
+    version <- hubUtils::extract_schema_version(config_schema_version)
 
-  if (length(version) == 0L) {
-    cli::cli_abort(
-      c(
-        "x" = "Valid {.field version} could not be extracted from config
-            file {.file {config_path}}",
-        "!" = "Please check property {.val schema_version} is correctly formatted."
+    if (length(version) == 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "Valid {.field version} could not be extracted from config
+              file {.file {config_path}}",
+          "!" = "Please check property {.val schema_version} is correctly formatted."
+        )
       )
-    )
-  }
+    }
 
   version
+  }
 }
 
 
@@ -41,8 +45,12 @@ check_config_schema_version <- function(schema_version, config = c("tasks", "adm
     ))
   }
 
+  # Extract the schema_repo from the schema_version URL
+  split_schema_version <- strsplit(schema_version, "/")[[1]]
+  schema_repo <- paste(split_schema_version[4:5], collapse = "/")
+
   check_prefix <- grepl(
-    "https://raw.githubusercontent.com/(hubverse-org|Infectious-Disease-Modeling-Hubs)/schemas/main/",
+    paste0("https://raw.githubusercontent.com/", schema_repo),
     schema_version,
     fixed = FALSE
   )
@@ -51,14 +59,15 @@ check_config_schema_version <- function(schema_version, config = c("tasks", "adm
     cli::cli_abort(c(
       "x" = "Invalid {.code schema_version} property.",
       "i" = "Valid {.code schema_version} properties should start with
-                         {.val https://raw.githubusercontent.com/hubverse-org/schemas/main/}
+                         {.val https://raw.githubusercontent.com/{schema_repo}/{schema_version}}
                          and resolve to the schema file's raw contents on GitHub."
     ))
   }
 }
 
 
-validate_schema_version_property <- function(validation, config = c("tasks", "admin")) {
+validate_schema_version_property <- function(validation, config = c("tasks", "admin"),
+                                             schema_repo = "Infectious-Disease-Modeling-Hubs/schemas") {
   config <- rlang::arg_match(config)
   schema_version <- jsonlite::read_json(attr(validation, "config_path"),
     simplifyVector = TRUE,
@@ -89,8 +98,7 @@ validate_schema_version_property <- function(validation, config = c("tasks", "ad
     )
   }
 
-  check_prefix <- grepl(
-    "https://raw.githubusercontent.com/(hubverse-org|Infectious-Disease-Modeling-Hubs)/schemas/main/",
+  check_prefix <- grepl(paste0("https://raw.githubusercontent.com/", schema_repo),
     schema_version,
     fixed = FALSE
   )
@@ -102,9 +110,9 @@ validate_schema_version_property <- function(validation, config = c("tasks", "ad
         instancePath = get_error_path(schema, "schema_version", "instance"),
         schemaPath = get_error_path(schema, "schema_version", "schema"),
         keyword = "schema_version prefix",
-        message = paste(
-          "Invalid 'schema_version' property. Should start with",
-          "'https://raw.githubusercontent.com/hubverse-org/schemas/main/'"
+        message = glue::glue(
+          "Invalid 'schema_version' property. Should start with
+          {.val https://raw.githubusercontent.com/{schema_repo}/{schema_version}}"
         ),
         schema = "",
         data = schema_version
